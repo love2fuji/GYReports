@@ -56,20 +56,53 @@ namespace GYReports
 
                 DataTable dt1 = getMonthData(RegionID, EnergyItemCode, startday, endday);
                 DataTable dt2 = getMonthData(RegionID, EnergyItemCode, lastYearStartday, lastYearEndday);
-                EnergyData monthData = new EnergyData();
-                monthData.ID=dt1.Rows[0]["ID"].ToString();
-                monthData.Name=dt1.Rows[0]["Name"].ToString();
-                monthData.Time=dt1.Rows[0]["Time"].ToString();
-                monthData.Value=dt1.Rows[0]["Value"].ToString();
 
+                DataTable dt3 = getYearData(RegionID, EnergyItemCode, startYear, endYear);
+                DataTable dt4 = getYearData(RegionID, EnergyItemCode, lastStartYear, lastEndYear);
+
+                EnergyData monthData = new EnergyData();
                 EnergyData lastMonthData = new EnergyData();
-                lastMonthData.ID = dt2.Rows[0]["ID"].ToString();
-                lastMonthData.Name = dt2.Rows[0]["Name"].ToString();
-                lastMonthData.Time = dt2.Rows[0]["Time"].ToString();
-                lastMonthData.Value = dt2.Rows[0]["Value"].ToString();
+                EnergyData yearData = new EnergyData();
+                EnergyData lastYearData = new EnergyData();
+
+                if (dt1.Rows.Count > 0)
+                {
+                    monthData.ID = dt1.Rows[0]["ID"].ToString();
+                    monthData.Name = dt1.Rows[0]["Name"].ToString();
+                    monthData.Time = dt1.Rows[0]["Time"].ToString();
+                    monthData.Value = dt1.Rows[0]["Value"].ToString();
+                }
+
+                if (dt2.Rows.Count > 0)
+                {
+                    lastMonthData.ID = dt2.Rows[0]["ID"].ToString();
+                    lastMonthData.Name = dt2.Rows[0]["Name"].ToString();
+                    lastMonthData.Time = dt2.Rows[0]["Time"].ToString();
+                    lastMonthData.Value = dt2.Rows[0]["Value"].ToString();
+                }
+
+                if (dt3.Rows.Count > 0)
+                {
+                    yearData.ID = dt3.Rows[0]["ID"].ToString();
+                    yearData.Name = dt3.Rows[0]["Name"].ToString();
+                    yearData.Time = dt3.Rows[0]["Time"].ToString();
+                    yearData.Value = dt3.Rows[0]["Value"].ToString();
+                }
+
+                if (dt4.Rows.Count > 0)
+                {
+                    lastYearData.ID = dt4.Rows[0]["ID"].ToString();
+                    lastYearData.Name = dt4.Rows[0]["Name"].ToString();
+                    lastYearData.Time = dt4.Rows[0]["Time"].ToString();
+                    lastYearData.Value = dt4.Rows[0]["Value"].ToString();
+                }
+
 
                 Console.WriteLine("月度->本期：" + monthData.Time+ " 值："+ monthData.Value);
                 Console.WriteLine("月度->：上年同期:" + lastMonthData.Time + " 值：" + lastMonthData.Value);
+
+                Console.WriteLine("年度->本期：" + yearData.Time + " 值：" + yearData.Value);
+                Console.WriteLine("年度->：上年同期:" + lastYearData.Time + " 值：" + lastYearData.Value);
 
                 //if (table.Rows.Count > 0)
                 //{
@@ -109,6 +142,30 @@ namespace GYReports
             dt = SQLHelper.GetDataTable(MonthSQL);
             return dt ;
            
+        }
+
+        public DataTable getYearData(string regionID, string energyItemCode, string startTime, string endTime)
+        {
+            DataTable dt = new DataTable();
+            string MonthSQL = @"SELECT Region.F_RegionID AS ID,Region.F_RegionName AS Name 
+                                    ,DATEADD(YEAR,DATEDIFF(YEAR,0,DayResult.F_StartDay),0) AS 'Time'
+                                    ,SUM((CASE WHEN RegionMeter.F_Operator ='加' THEN 1 ELSE -1 END)*DayResult.F_Value * RegionMeter.F_Rate/100) AS Value
+                                    FROM T_MC_MeterDayResult DayResult
+                                    INNER JOIN T_ST_CircuitMeterInfo Circuit ON DayResult.F_MeterID = Circuit.F_MeterID
+	                                INNER JOIN T_DT_EnergyItemDict EnergyItem ON Circuit.F_EnergyItemCode = EnergyItem.F_EnergyItemCode
+	                                INNER JOIN T_ST_MeterParamInfo ParamInfo ON DayResult.F_MeterParamID = ParamInfo.F_MeterParamID
+	                                INNER JOIN T_ST_RegionMeter RegionMeter ON DayResult.F_MeterID = RegionMeter.F_MeterID
+	                                INNER JOIN T_ST_Region Region ON Region.F_RegionID = RegionMeter.F_RegionID
+                                    WHERE Region.F_RegionID ='" + regionID + @"'
+                                    AND EnergyItem.F_EnergyItemCode='" + energyItemCode + @"'
+                                    AND ParamInfo.F_IsEnergyValue = 1
+                                    AND DayResult.F_StartDay BETWEEN '" + startTime + @"' AND  '" + endTime + @"'
+                                    GROUP BY Region.F_RegionID,Region.F_RegionName,DATEADD(YEAR,DATEDIFF(YEAR,0,DayResult.F_StartDay),0)
+                                    ORDER BY ID,'Time' ASC";
+
+            dt = SQLHelper.GetDataTable(MonthSQL);
+            return dt;
+
         }
 
     }
