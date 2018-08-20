@@ -8,8 +8,9 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>GYReports</RootNamespace>
     <AssemblyName>GYReports</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Commom\Config.cs" />
     <Compile Include="Commom\EnergyData.cs" />
+    <Compile Include="Commom\RegionAreaPeople.cs" />
     <Compile Include="Commom\SQLHelper.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
@@ -65,6 +67,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="App.config" />
     <None Include="Properties\Settings.settings">

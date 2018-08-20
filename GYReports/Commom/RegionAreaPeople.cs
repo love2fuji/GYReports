@@ -5,11 +5,11 @@ using System.Text;
 
 namespace GYReports.Commom
 {
-    public class EnergyData
+    public class RegionAreaPeople
     {
         public string ID { get; set; }
-        public string Name { get; set; }
-        public string Time { get; set; }
-        public Decimal Value { get; set; }
+        public decimal Area { get; set; }
+        public decimal People { get; set; }
+        public decimal Value { get; set; }
     }
 }
